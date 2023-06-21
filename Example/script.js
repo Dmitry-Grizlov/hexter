@@ -1,10 +1,8 @@
-'use strict';
-
 class Color {
   constructor(r, g, b) {
     this.set(r, g, b);
   }
-  
+
   toString() {
     return `rgb(${Math.round(this.r)}, ${Math.round(this.g)}, ${Math.round(this.b)})`;
   }
@@ -273,7 +271,7 @@ class Solver {
     function fmt(idx, multiplier = 1) {
       return Math.round(filters[idx] * multiplier);
     }
-    return `filter: invert(${fmt(0)}%) sepia(${fmt(1)}%) saturate(${fmt(2)}%) hue-rotate(${fmt(3, 3.6)}deg) brightness(${fmt(4)}%) contrast(${fmt(5)}%);`;
+    return `invert(${fmt(0)}%) sepia(${fmt(1)}%) saturate(${fmt(2)}%) hue-rotate(${fmt(3, 3.6)}deg) brightness(${fmt(4)}%) contrast(${fmt(5)}%);`;
   }
 }
 
@@ -287,39 +285,64 @@ function hexToRgb(hex) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? [
-      parseInt(result[1], 16),
-      parseInt(result[2], 16),
-      parseInt(result[3], 16),
-    ]
+        parseInt(result[1], 16),
+        parseInt(result[2], 16),
+        parseInt(result[3], 16),
+      ]
     : null;
 }
 
-$(document).ready(() => {
-  $('button.execute').click(() => {
-    const rgb = hexToRgb($('input.target').val());
-    if (rgb.length !== 3) {
-      alert('Invalid format!');
-      return;
-    }
+function hexToCssFilter(hex) {
+  const rgb = hexToRgb(hex);
+  if (rgb.length !== 3) {
+    return;
+  }
 
-    const color = new Color(rgb[0], rgb[1], rgb[2]);
-    const solver = new Solver(color);
-    const result = solver.solve();
+  const color = new Color(rgb[0], rgb[1], rgb[2]);
+  const solver = new Solver(color);
+  const result = solver.solve();
 
-    let lossMsg;
-    if (result.loss < 1) {
-      lossMsg = 'This is a perfect result.';
-    } else if (result.loss < 5) {
-      lossMsg = 'The is close enough.';
-    } else if (result.loss < 15) {
-      lossMsg = 'The color is somewhat off. Consider running it again.';
-    } else {
-      lossMsg = 'The color is extremely off. Run it again!';
-    }
+  return result.filter;
+}
 
-    $('.realPixel').css('background-color', color.toString());
-    $('.filterPixel').attr('style', result.filter);
-    $('.filterDetail').text(result.filter);
-    $('.lossDetail').html(`Loss: ${result.loss.toFixed(1)}. <b>${lossMsg}</b>`);
+document.addEventListener("DOMContentLoaded", () => {
+  document
+    .querySelector("button.execute")
+    .addEventListener("click", function () {
+      document.querySelector("#filterDetail").textContent = "Filter: ";
+      const input = document.querySelector("input.target");
+      const rgb = hexToRgb(input.value);
+      if (rgb.length !== 3) {
+        alert("Invalid format!");
+        return;
+      }
+
+      const color = new Color(rgb[0], rgb[1], rgb[2]);
+      const solver = new Solver(color);
+      const result = solver.solve();
+
+      let lossMsg;
+      if (result.loss < 1) {
+        lossMsg = "This is a perfect result.";
+      } else if (result.loss < 5) {
+        lossMsg = "The color is close enough.";
+      } else if (result.loss < 15) {
+        lossMsg = "The color is somewhat off. Consider running it again.";
+      } else {
+        lossMsg = "The color is extremely off. Run it again!";
+      }
+
+      console.log(result);
+      document.querySelector("#result").style.display = "block";
+      document.querySelector(".realPixel").style.backgroundColor = color.toString();
+      document.querySelector(".filterPixel").setAttribute("style", `filter:${result.filter}`);
+      document.querySelector("#filterDetail").textContent += result.filter;
+      document.querySelector(".lossDetail").innerHTML = `Loss: ${result.loss.toFixed(1)}. <b>${lossMsg}</b>`;
+    });
+
+  document.querySelector("#copy").addEventListener("click", function () {
+    navigator.clipboard.writeText(
+      document.querySelector("#filterDetail").textContent.toLowerCase()
+    );
   });
 });
