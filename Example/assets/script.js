@@ -1,4 +1,4 @@
-import {hexToCssFilter} from "../dist/hexter.js"
+import {hexToCssFilter} from "../../dist/hexter.js"
 
 class Presenter {
   constructor(object){
