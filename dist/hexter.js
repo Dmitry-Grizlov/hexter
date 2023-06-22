@@ -161,11 +161,8 @@ class Solver {
 
   solve() {
     const result = this.solveWide();
-    return {
-      values: result.values,
-      loss: result.loss,
-      filter: this.css(result.values),
-    };
+    result.filter = this.css(result.values);
+    return result;
   }
 
   solveWide() {
@@ -304,7 +301,6 @@ export function hexToCssFilter(hex){
 
     const color = new Color(rgb[0], rgb[1], rgb[2]);
     const solver = new Solver(color);
-    const result = solver.solve();
 
-    return result.filter;
+    return solver.solve();
 };
