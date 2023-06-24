@@ -3,12 +3,22 @@ class Color {
     this.set(r, g, b);
   }
 
+/**
+ * sets initial or rewrites existing r, g and b of RGB to the Color instance
+ * @param {number} r 
+ * @param {number} g 
+ * @param {number} b 
+ */
   set(r, g, b) {
     this.r = this.clamp(r);
     this.g = this.clamp(g);
     this.b = this.clamp(b);
   }
 
+  /**
+   * recalculates rgb acording to the angle provded
+   * @param {number} angle default = 0
+   */
   hueRotate(angle = 0) {
     angle = angle / 180 * Math.PI;
     const sin = Math.sin(angle);
@@ -69,6 +79,10 @@ class Color {
     ]);
   }
 
+/**
+ * recalculates rgb according to the matrix provided
+ * @param {Array<number>[9]} matrix
+ */
   multiply(matrix) {
     const newR = this.clamp(this.r * matrix[0] + this.g * matrix[1] + this.b * matrix[2]);
     const newG = this.clamp(this.r * matrix[3] + this.g * matrix[4] + this.b * matrix[5]);
@@ -138,6 +152,11 @@ class Color {
     };
   }
 
+  /** 
+  * controls value not to leave the borders of [0, 255]
+  * @param {number} value - r g or b of RGB 
+  * @returns {number} if value > 255 => 255; if value < 0 => 0; otherwise => value
+  */
   clamp(value) {
     if (value > 255) {
       value = 255;
