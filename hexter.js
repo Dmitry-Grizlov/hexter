@@ -30,7 +30,7 @@ class Color {
   }
 
   /**
-   * converts rgb to hsl.
+   * converts rgb to hsl, according to the algorithm from https://www.niwa.nu/2013/05/math-behind-colorspace-conversions-rgb-hsl
    * @returns {object} hsl object
    */
   hsl() {
